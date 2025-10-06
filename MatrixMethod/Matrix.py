@@ -4,7 +4,9 @@
 from math import isclose
 
 import numpy as np
-
+import csv
+from .MatrixTypes import ApproximateResult
+from collections import Counter
 
 
 def maxmin(a: np.ndarray):
@@ -19,7 +21,9 @@ def saddle_point(pay_matrix: np.ndarray) -> float|int|None:
 
 # смешанные методы
 def MixStrategy(pay_matrix: np.ndarray, A: np.ndarray, B: np.ndarray) -> tuple:
+    """ Решение игры при помощи смешанных стратегий"""
     return A.dot(pay_matrix).dot(B.T)
+
 
 
 def incA(a: int) -> str: return f"A{a+1}"
@@ -30,7 +34,11 @@ def incB(b: int) -> str: return f"B{b+1}"
 
 # приближенные значения
 # на вход таблица типа np.ndarray и кол-во итераций, на выходе таблица с готовым ответом
-def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> np.ndarray[np.ndarray[str]]:
+def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> ApproximateResult:
+    """
+        Решение матричных игр при помощи приближённым методом
+    """
+
     # список выбранных стратегий игрока А и В
     selected_strategy_a: list[int] = list()
     selected_strategy_b: list[int] = list()
@@ -74,7 +82,7 @@ def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> np.ndarray[np
 
 
     # формирование результата, формирую его как строки для простой вставки в таблицу
-    for i in range(2, len(selected_strategy_a) - 1):
+    for i in range(2, len(selected_strategy_a)):
         sum_a += pay_matrix[selected_strategy_a[i-1]].copy()
         sum_b += pay_matrix[:, selected_strategy_b[i-1]].copy()
         v_n: np.float64 = np.min(sum_a) / i
@@ -83,4 +91,74 @@ def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> np.ndarray[np
         item_table = [str(i)] + [incA(selected_strategy_a[i-1])] + sum_a.tolist() + [incB(selected_strategy_b[i-1])] + sum_b.tolist() + [v_n, v__n, v_avg_n]
         table.append(item_table)
 
-    return np.array(table)
+    result = ApproximateResult()
+    result.table = np.array(table)
+    result.count_clean_strategy_a = np.array([ selected_strategy_a.count(i) for i in range(0, pay_matrix.shape[1]) ])
+    result.count_clean_strategy_b = np.array([ selected_strategy_b.count(i) for i in range(0, pay_matrix.shape[0]) ])
+    result.frequency_a = result.count_clean_strategy_a / count_step
+    result.frequency_b = result.count_clean_strategy_b / count_step
+    result.price = v_avg_n
+
+    return result
+
+
+
+
+def save_approxima_solving(path: str, table: np.ndarray[np.ndarray[str]]) -> None:
+    """
+        Сохранение результата в файл решённый приближённым методом
+        path - путь до файла, именно путь, а не название
+        table - таблица, желательно что-бы все элементы имели тип str
+    """
+    with open(path, "w") as f:
+        writer = csv.writer(f, delimiter=';', quoting=csv.QUOTE_MINIMAL)
+        writer.writerows(table)
+
+
+
+def find_matrix_risk(mtrx: np.ndarray[np.ndarray[float]]) -> np.ndarray[np.ndarray[float]]:
+    b = [np.max(i) for i in mtrx.copy().T]
+    return np.array( [b - i for i in mtrx.copy()] )
+
+
+import numpy as np
+
+
+def Bayes_criterion(matrixA, matrixP, pos):
+    # Преобразуем в numpy arrays
+    A = np.array(matrixA)
+    P = np.array(matrixP)
+    q = np.array(pos)
+
+    # Вычисляем суммы для каждой стратегии
+    sums_A = A @ q  # матричное умножение = sum(x*y for x,y in zip(row, pos))
+    sums_P = P @ q
+
+    # Собираем результаты
+    tableA = [[f"A{i + 1}", *row, sum_val] for i, (row, sum_val) in enumerate(zip(matrixA, sums_A))]
+    tableA.append(["qj", *pos, ""])
+
+    tableP = [[f"A{i + 1}", *row, sum_val] for i, (row, sum_val) in enumerate(zip(matrixP, sums_P))]
+    tableP.append(["qj", *pos, ""])
+
+    return tableA, tableP
+
+
+def Wild_criterion(matrix):
+    table = []
+    for i in range(len(matrix)):
+        table.append([f"A{i + 1}", *matrix[i], min(matrix[i])])
+    return table
+
+def Savage_criterion(matrix):
+    table = []
+    for i in range(len(matrix)):
+        table.append([f"A{i + 1}", *matrix[i], max(matrix[i])])
+    return table
+
+def Hurwitz_criterion(matrix):
+    table = []
+    k = 0.6
+    for i in range(len(matrix)):
+        table.append([f"A{i + 1}", *matrix[i], min(matrix[i]), max(matrix[i]), k*min(matrix[i]) + (1 - k)*max(matrix[i])])
+    return table
