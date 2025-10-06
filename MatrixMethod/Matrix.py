@@ -30,19 +30,18 @@ def incB(b: int) -> str: return f"B{b+1}"
 
 # приближенные значения
 # на вход таблица типа np.ndarray и кол-во итераций, на выходе таблица с готовым ответом
-def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> list[list[str]]:
+def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> np.ndarray[np.ndarray[str]]:
     # список выбранных стратегий игрока А и В
     selected_strategy_a: list[int] = list()
     selected_strategy_b: list[int] = list()
 
-
     tmp = np.array([np.min(i) for i in pay_matrix])
     selected_strategy_a.append( int(np.where(np.isclose(tmp, max(tmp)))[0][0]) )
-    print(selected_strategy_a)
+    # print(selected_strategy_a)
 
     tmp = pay_matrix[selected_strategy_a[-1]]
     selected_strategy_b.append( int(np.where(np.isclose(tmp, min(tmp)))[0][0]) )
-    print(selected_strategy_b)
+    # print(selected_strategy_b)
 
     for i in range(count_step):
         tmp = pay_matrix[:, selected_strategy_b[-1]]
@@ -51,8 +50,8 @@ def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> list[list[str
         tmp = pay_matrix[selected_strategy_a[-1]]
         selected_strategy_b.append( int(np.where(np.isclose(tmp, min(tmp)))[0][0]) )
 
-#   сборка ответа
-#   учесть что надо сложить каждый новый результат и добавлять его в таблицу
+    #   сборка ответа
+    #   учесть что надо сложить каждый новый результат и добавлять его в таблицу
     table: list[list[str]] = list()
 
     title = ["N", "Стратегии игрока А"] + \
@@ -64,7 +63,24 @@ def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> list[list[str
     # добавление тайтла
     table.append(title)
 
-    
+
+    sum_a: np.ndarray = pay_matrix[selected_strategy_a[0]].copy()
+    sum_b: np.ndarray = pay_matrix[:, selected_strategy_b[0]].copy()
+    v_n: np.float64 = np.min(sum_a)
+    v__n: np.float64 = np.max(sum_b)
+    v_avg_n: np.float64 = (v_n + v__n) / 2
+    item_table = ["1"] + [incA(selected_strategy_a[0])] + sum_a.tolist() + [incB(selected_strategy_b[0])] + sum_b.tolist() + [v_n, v__n, v_avg_n]
+    table.append(item_table)
 
 
-    return [[""]]
+    # формирование результата, формирую его как строки для простой вставки в таблицу
+    for i in range(2, len(selected_strategy_a) - 1):
+        sum_a += pay_matrix[selected_strategy_a[i-1]].copy()
+        sum_b += pay_matrix[:, selected_strategy_b[i-1]].copy()
+        v_n: np.float64 = np.min(sum_a) / i
+        v__n: np.float64 = np.max(sum_b) / i
+        v_avg_n: np.float64 = (v_n + v__n) / 2
+        item_table = [str(i)] + [incA(selected_strategy_a[i-1])] + sum_a.tolist() + [incB(selected_strategy_b[i-1])] + sum_b.tolist() + [v_n, v__n, v_avg_n]
+        table.append(item_table)
+
+    return np.array(table)
