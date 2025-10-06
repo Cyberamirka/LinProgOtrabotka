@@ -2,6 +2,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QMainWindow, QHBoxLayout, QSt
 import sys
 
 from menu import Menu
+# задачи линейного программирования
 from LinProgWidget.LinprogWidget import LinProgWidget
 
 
