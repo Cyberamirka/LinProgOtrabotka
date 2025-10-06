@@ -9,4 +9,5 @@ PayMatrix = np.array([
     [0, 2, 5]
 ])
 
-ApproximateSolving(PayMatrix, 5)
+
+ApproximateSolving(PayMatrix, 20)

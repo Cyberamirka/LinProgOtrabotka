@@ -36,22 +36,20 @@ def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> list[list[str
     selected_strategy_b: list[int] = list()
 
 
-    # 1 этап
     tmp = np.array([np.min(i) for i in pay_matrix])
     selected_strategy_a.append( int(np.where(np.isclose(tmp, max(tmp)))[0][0]) )
-
-
-    for i in range(count_step):
-        # продолжение 1 этапа
-        tmp = pay_matrix[selected_strategy_a[-1]]
-        selected_strategy_b.append( int(np.where(np.isclose(tmp, min(tmp)))[0][0]) )
-
-        # 2 этап
-        tmp = pay_matrix[selected_strategy_b[-1]]
-        selected_strategy_a.append( int(np.where(np.isclose(tmp, max(tmp)))[0][0]) )
+    print(selected_strategy_a)
 
     tmp = pay_matrix[selected_strategy_a[-1]]
     selected_strategy_b.append( int(np.where(np.isclose(tmp, min(tmp)))[0][0]) )
+    print(selected_strategy_b)
+
+    for i in range(count_step):
+        tmp = pay_matrix[:, selected_strategy_b[-1]]
+        selected_strategy_a.append( int(np.where(np.isclose(tmp, max(tmp)))[0][0]) )
+
+        tmp = pay_matrix[selected_strategy_a[-1]]
+        selected_strategy_b.append( int(np.where(np.isclose(tmp, min(tmp)))[0][0]) )
 
 #   сборка ответа
 #   учесть что надо сложить каждый новый результат и добавлять его в таблицу
@@ -69,6 +67,4 @@ def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> list[list[str
     
 
 
-
-
-
+    return [[""]]
