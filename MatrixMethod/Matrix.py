@@ -1,6 +1,7 @@
 """
     Matrix - модуль для решения задач
 """
+from math import isclose
 
 import numpy as np
 
@@ -21,22 +22,51 @@ def MixStrategy(pay_matrix: np.ndarray, A: np.ndarray, B: np.ndarray) -> tuple:
     return A.dot(pay_matrix).dot(B.T)
 
 
+def incA(a: int) -> str: return f"A{a+1}"
+def incB(b: int) -> str: return f"B{b+1}"
+
+
+
+
 # приближенные значения
 # на вход таблица типа np.ndarray и кол-во итераций, на выходе таблица с готовым ответом
 def ApproximateSolving(pay_matrix: np.ndarray, count_step: int) -> list[list[str]]:
-    # последне использованная стратегия А
-    last_a_strategy: list = list()
-    # последне использованная стратегия В
-    last_b_strategy: list = list()
-
     # список выбранных стратегий игрока А и В
-    selected_strategy_a: list = list()
-    selected_strategy_b: list = list()
+    selected_strategy_a: list[int] = list()
+    selected_strategy_b: list[int] = list()
 
-    # приближенные значения игры
-    vn: list = list()
-    v_n: list = list()
-    avg_v_n: list = list()
+
+    # 1 этап
+    tmp = np.array([np.min(i) for i in pay_matrix])
+    selected_strategy_a.append( int(np.where(np.isclose(tmp, max(tmp)))[0][0]) )
+
+
+    for i in range(count_step):
+        # продолжение 1 этапа
+        tmp = pay_matrix[selected_strategy_a[-1]]
+        selected_strategy_b.append( int(np.where(np.isclose(tmp, min(tmp)))[0][0]) )
+
+        # 2 этап
+        tmp = pay_matrix[selected_strategy_b[-1]]
+        selected_strategy_a.append( int(np.where(np.isclose(tmp, max(tmp)))[0][0]) )
+
+    tmp = pay_matrix[selected_strategy_a[-1]]
+    selected_strategy_b.append( int(np.where(np.isclose(tmp, min(tmp)))[0][0]) )
+
+#   сборка ответа
+#   учесть что надо сложить каждый новый результат и добавлять его в таблицу
+    table: list[list[str]] = list()
+
+    title = ["N", "Стратегии игрока А"] + \
+            [f"B{i + 1}" for i in range(pay_matrix.shape[1])] + \
+            ["Стратегии игрока B"] + \
+            [f"A{i + 1}" for i in range(pay_matrix.shape[0])] + \
+            ["V'n", "V''n", "Vср n"]
+
+    # добавление тайтла
+    table.append(title)
+
+    
 
 
 
