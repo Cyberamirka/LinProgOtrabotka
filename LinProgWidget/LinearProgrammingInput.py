@@ -3,8 +3,6 @@ from PyQt6.QtWidgets import QWidget, QHBoxLayout, QComboBox, QLabel, QPushButton
     QGridLayout
 
 
-from .LinProgTypes import *
-
 
 
 FIXED_SIZE = QSize(50, 50)

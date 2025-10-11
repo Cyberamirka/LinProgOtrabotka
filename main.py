@@ -4,6 +4,7 @@ import sys
 from menu import Menu
 # задачи линейного программирования
 from LinProgWidget.LinprogWidget import LinProgWidget
+from MatrixMWidget.MatrixGameWidget import MatrixGameWidget
 
 
 class MainView (QMainWindow):
@@ -18,7 +19,7 @@ class MainView (QMainWindow):
         # create stacked widget
         self.stack_widget: QStackedWidget = QStackedWidget()
         self.stack_widget.addWidget(LinProgWidget())
-        self.stack_widget.addWidget(QLabel("Coming soon..."))
+        self.stack_widget.addWidget(MatrixGameWidget())
         self.stack_widget.addWidget(QLabel("Coming soon..."))
 
 

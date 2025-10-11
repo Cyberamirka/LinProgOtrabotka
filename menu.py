@@ -1,7 +1,6 @@
 from PyQt6.QtGui import QFont, QPalette, QColor
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QFrame
-from PyQt6.QtCore import pyqtSignal, Qt
-
+from PyQt6.QtCore import pyqtSignal, Qt, QSize
 
 
 class Menu (QFrame):
@@ -22,6 +21,7 @@ class Menu (QFrame):
         self.title.setFixedHeight(20)
 
         self.setLayout(self.v_box)
+        self.setMaximumSize(180, 1000)
 
 
 
