@@ -1,16 +1,16 @@
 """
     Matrix - модуль для решения задач
 """
-from math import isclose
 
 import numpy as np
 import csv
 from .MatrixTypes import ApproximateResult
-from collections import Counter
+
 
 
 def maxmin(a: np.ndarray):
     return np.max([np.min(i) for i in a])
+
 
 def minmax(a: np.ndarray):
     return np.min([np.max(i) for i in a.T])
@@ -116,12 +116,10 @@ def save_approxima_solving(path: str, table: np.ndarray[np.ndarray[str]]) -> Non
 
 
 
-def find_matrix_risk(mtrx: np.ndarray[np.ndarray[float]]) -> np.ndarray[np.ndarray[float]]:
-    b = [np.max(i) for i in mtrx.copy().T]
+def find_matrix_risk(mtrx: np.ndarray[np.ndarray[float]]):
+    b = np.array([np.max(i) for i in mtrx.copy().T])
     return np.array( [b - i for i in mtrx.copy()] )
 
-
-import numpy as np
 
 
 def Bayes_criterion(matrixA, matrixP, pos):
@@ -131,34 +129,61 @@ def Bayes_criterion(matrixA, matrixP, pos):
     q = np.array(pos)
 
     # Вычисляем суммы для каждой стратегии
-    sums_A = A @ q  # матричное умножение = sum(x*y for x,y in zip(row, pos))
-    sums_P = P @ q
+    sums_A: np.ndarray = A @ q  # матричное умножение = sum(x*y for x,y in zip(row, pos))
+    sums_P: np.ndarray = P @ q
+
 
     # Собираем результаты
-    tableA = [[f"A{i + 1}", *row, sum_val] for i, (row, sum_val) in enumerate(zip(matrixA, sums_A))]
+    tableA = [[incA(i), *row, sum_val] for i, (row, sum_val) in enumerate(zip(matrixA, sums_A))]
+    tableA = [["Стратегия А"] + [f"П{i + 1}" for i in range(len(matrixA))] + ["Средний выйгрыш А"]] + tableA
     tableA.append(["qj", *pos, ""])
 
-    tableP = [[f"A{i + 1}", *row, sum_val] for i, (row, sum_val) in enumerate(zip(matrixP, sums_P))]
+    tableP = [[incA(i), *row, sum_val] for i, (row, sum_val) in enumerate(zip(matrixP, sums_P))]
+    tableP = [["Стратегия B"] + [f"П{i + 1}" for i in range(len(matrixA))] + ["Средний риск"]] + tableP
     tableP.append(["qj", *pos, ""])
 
-    return tableA, tableP
+    return tableA, tableP, sums_A.tolist().index(max(sums_A)), sums_P.tolist().index(min(sums_P))
+
 
 
 def Wild_criterion(matrix):
-    table = []
+    table = [["Стратегии А"] + [f"П{i+1}" for i in range(len(matrix[0]))] + ["a"]]
+    maxVal = 0
+    index = 0
+
     for i in range(len(matrix)):
+        item = min(matrix[i])
+        if item > maxVal:
+            maxVal = item
+            index = i
         table.append([f"A{i + 1}", *matrix[i], min(matrix[i])])
-    return table
+    return table, index
+
 
 def Savage_criterion(matrix):
-    table = []
+    table = [["Стратегии А"] + [f"П{i + 1}" for i in range(len(matrix[0]))] + ["p"]]
+    maxVal = matrix[0][0]
+    index = 0
+
     for i in range(len(matrix)):
+        item = max(matrix[i])
+        if item < maxVal:
+            maxVal = item
+            index = i
         table.append([f"A{i + 1}", *matrix[i], max(matrix[i])])
-    return table
+    return table, index
+
 
 def Hurwitz_criterion(matrix):
-    table = []
+    table = [["Стратегии А"] + [f"П{i+1}" for i in range(len(matrix[0]))] + ["a", "w", "h"]]
     k = 0.6
+    maxVal = 0
+    index = 0
+
     for i in range(len(matrix)):
+        item = k*min(matrix[i]) + (1 - k)*max(matrix[i])
+        if item > maxVal:
+            maxVal = item
+            index = i
         table.append([f"A{i + 1}", *matrix[i], min(matrix[i]), max(matrix[i]), k*min(matrix[i]) + (1 - k)*max(matrix[i])])
-    return table
+    return table, index

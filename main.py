@@ -5,6 +5,7 @@ from menu import Menu
 # задачи линейного программирования
 from LinProgWidget.LinprogWidget import LinProgWidget
 from MatrixMWidget.MatrixGameWidget import MatrixGameWidget
+from CoderWidget.CoderWidget import CoderWidget
 
 
 class MainView (QMainWindow):
@@ -20,7 +21,7 @@ class MainView (QMainWindow):
         self.stack_widget: QStackedWidget = QStackedWidget()
         self.stack_widget.addWidget(LinProgWidget())
         self.stack_widget.addWidget(MatrixGameWidget())
-        self.stack_widget.addWidget(QLabel("Coming soon..."))
+        self.stack_widget.addWidget(CoderWidget())
 
 
         # create menu
@@ -44,6 +45,14 @@ class MainView (QMainWindow):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+
+    app.setStyleSheet("""
+        QFrame#FrameWidget {
+            border: 1px solid #cccccc;
+            border-radius: 8px;
+        }
+    """)
+
     # глобальное изменение шрифта
     font = app.font()
     font.setPointSize(11)

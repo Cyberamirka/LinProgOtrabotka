@@ -9,6 +9,7 @@ class Menu (QFrame):
     def __init__(self, parent: QWidget|None = None) -> None:
         super().__init__(parent)
 
+        self.setObjectName("FrameWidget")
         self.setFrameStyle(QFrame.Shape.Panel | QFrame.Shadow.Plain)
         self.setLineWidth(1)
         self.setMidLineWidth(1)
