@@ -132,14 +132,14 @@ def Bayes_criterion(matrixA, matrixP, pos):
     sums_A: np.ndarray = A @ q  # матричное умножение = sum(x*y for x,y in zip(row, pos))
     sums_P: np.ndarray = P @ q
 
-
+    print(sums_A)
     # Собираем результаты
     tableA = [[incA(i), *row, sum_val] for i, (row, sum_val) in enumerate(zip(matrixA, sums_A))]
-    tableA = [["Стратегия А"] + [f"П{i + 1}" for i in range(len(matrixA))] + ["Средний выйгрыш А"]] + tableA
+    tableA = [["Стратегия А"] + [f"П{i + 1}" for i in range(len(matrixA[0]))] + ["Средний выйгрыш А"]] + tableA
     tableA.append(["qj", *pos, ""])
 
     tableP = [[incA(i), *row, sum_val] for i, (row, sum_val) in enumerate(zip(matrixP, sums_P))]
-    tableP = [["Стратегия B"] + [f"П{i + 1}" for i in range(len(matrixA))] + ["Средний риск"]] + tableP
+    tableP = [["Стратегия B"] + [f"П{i + 1}" for i in range(len(matrixP[0]))] + ["Средний риск"]] + tableP
     tableP.append(["qj", *pos, ""])
 
     return tableA, tableP, sums_A.tolist().index(max(sums_A)), sums_P.tolist().index(min(sums_P))

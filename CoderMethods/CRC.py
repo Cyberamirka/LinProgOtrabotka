@@ -37,58 +37,20 @@ def mod2_division(dividend: str, divisor: str) -> str:
     return ''.join(dividend)[-divisor_len + 1:]
 
 
-def calculate_crc(message: str, generator: str = "10011",
-                  initial_value: str = "0", reverse_bits: bool = False,
-                  final_xor: str = "0") -> Tuple[str, str]:
-    """
-    Вычисляет CRC для сообщения
-
-    Args:
-        message: Исходное сообщение
-        generator: Порождающий полином (например "10011")
-        initial_value: Начальное значение регистра ("0" или "1")
-        reverse_bits: Обратный порядок битов
-        final_xor: Дополнительный XOR для финального результата
-
-    Returns:
-        Tuple[encoded_message, crc_value]
-    """
-    # Преобразуем сообщение в биты
-    message_bits = string_to_bits(message, reverse_bits)
-
-    # Добавляем нули в конец (длина CRC = len(generator) - 1)
+def calculate_crc_value(message_bits: str, generator: str = "10011") -> str:
+    """Вычисляет CRC значение или возвращает пустоту если отключено"""
+    if generator == "1":  # специальное значение для "CRC отключен"
+        return ""  # пустая строка - CRC не добавляется
+    
     crc_length = len(generator) - 1
     dividend = message_bits + '0' * crc_length
-
-    # Выполняем деление по модулю 2
     remainder = mod2_division(dividend, generator)
-
-    # Применяем final XOR если нужно
-    if final_xor != "0":
-        xor_mask = final_xor.zfill(crc_length)
-        remainder = ''.join('1' if remainder[i] != xor_mask[i] else '0'
-                            for i in range(crc_length))
-
-    # Формируем закодированное сообщение
-    encoded_bits = message_bits + remainder
-    encoded_message = bits_to_string(encoded_bits, reverse_bits)
-
-    return encoded_message, remainder
+    return remainder
 
 
-def verify_crc(encoded_message: str, generator: str = "10011",
-               reverse_bits: bool = False) -> bool:
+def verify_crc_for_bits(encoded_bits: str, generator: str = "10011") -> bool:
     """
-    Проверяет корректность CRC сообщения
-
-    Returns:
-        True если сообщение не содержит ошибок
+    Проверяет CRC для готовой битовой последовательности
     """
-    # Преобразуем в биты
-    encoded_bits = string_to_bits(encoded_message, reverse_bits)
-
-    # Делим на порождающий полином
     remainder = mod2_division(encoded_bits, generator)
-
-    # Если остаток нулевой - ошибок нет
     return all(bit == '0' for bit in remainder)

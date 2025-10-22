@@ -24,69 +24,48 @@ def Huffman(nodes: list[CoderNode]) -> Tuple[CodeTable, List[List[Tuple[str, flo
     steps = []
 
     # Начальное состояние
-    initial_state = [(node.char, round(node.frequency, 10)) for node in nodes]
-    initial_state.sort(key=lambda x: (-x[1], x[0]))  # Сортируем для отображения (от большего к меньшему)
-    steps.append(initial_state)
+    nodes_list = [(node.char, node.frequency, None, None) for node in nodes]  # (char, freq, left, right)
+    nodes_list.sort(key=lambda x: (-x[1], x[0]))  # сортируем по убыванию
+    steps.append([(char, round(freq, 10)) for char, freq, _, _ in nodes_list])
 
-    # Создаем кучу (min-heap)
-    heap = []
-    for node in nodes:
-        heapq.heappush(heap, HuffmanNode(node.char, node.frequency))
-
-    # Процесс построения дерева
-    while len(heap) > 1:
-        # Берем два наименьших
-        # (heapq всегда гарантирует, что мы берем самые маленькие)
-        left = heapq.heappop(heap)
-        right = heapq.heappop(heap)
-
+    # Работаем с обычным списком
+    while len(nodes_list) > 1:
+        # Берем два последних (самых маленьких) элемента
+        nodes_list.sort(key=lambda x: (-x[1], x[0]))  # всегда сортируем перед взятием
+        
+        # Последние два элемента - самые маленькие
+        left_char, left_freq, left_left, left_right = nodes_list.pop()
+        right_char, right_freq, right_left, right_right = nodes_list.pop()
+        
         # Создаем новый узел
-        new_char = f"{left.char}{right.char}"  # Имя для отладки
-        new_freq = left.freq + right.freq
-
-        # Важно: 'left' (меньший) может быть '1', 'right' (больший) '0'
-        # или наоборот. Чтобы коды были стабильными (и как в
-        # классических примерах), часто делают так:
-        # узел с меньшей частотой идет влево (0),
-        # с большей - вправо (1).
-        # (В коде heapq left/right могут быть не отсортированы,
-        # если у них одинаковая частота.
-        # Но для самого алгоритма это не важно, он всё равно
-        # будет оптимальным.
-        # Давайте оставим left=0, right=1 для простоты.)
-
-        new_node = HuffmanNode(new_char, new_freq, left, right)
-        heapq.heappush(heap, new_node)
-
-        # --- Сохранение шага для GUI ---
-        # Копируем *текущее* состояние кучи
-        current_state = []
-        temp_heap = heap.copy()
-        while temp_heap:
-            node = heapq.heappop(temp_heap)
-            current_state.append((node.char, round(node.freq, 10)))
-
-        # Сортируем для красивой таблицы (от большего к меньшему)
-        current_state.sort(key=lambda x: (-x[1], x[0]))
+        new_char = f"{left_char}{right_char}"
+        new_freq = left_freq + right_freq
+        
+        # Добавляем обратно
+        nodes_list.append((new_char, new_freq, 
+                          (left_char, left_freq, left_left, left_right),
+                          (right_char, right_freq, right_left, right_right)))
+        
+        # Сохраняем шаг
+        current_state = [(char, round(freq, 10)) for char, freq, _, _ in nodes_list]
+        current_state.sort(key=lambda x: (-x[1], x[0]))  # сортируем для отображения
         steps.append(current_state)
-        # ---------------------------------
 
-    # Генерация кодов (без изменений)
+    # Генерация кодов
     codes = {}
-
-    def _generate_codes(node: HuffmanNode, current_code: str):
-        if node is None:
+    
+    def _generate_codes(node_tuple, current_code):
+        if node_tuple is None:
             return
-        # Если это "лист" (исходный символ)
-        if node.left is None and node.right is None:
-            codes[node.char] = current_code if current_code else "0"  # Если всего 1 символ
+        char, freq, left, right = node_tuple
+        if left is None and right is None:  # лист
+            codes[char] = current_code if current_code else "0"
             return
-        # Идем влево (0) и вправо (1)
-        _generate_codes(node.left, current_code + '0')
-        _generate_codes(node.right, current_code + '1')
-
-    root = heap[0] if heap else None
-    _generate_codes(root, '')
+        _generate_codes(left, current_code + '0')
+        _generate_codes(right, current_code + '1')
+    
+    if nodes_list:
+        _generate_codes(nodes_list[0], '')
 
     # Создаем таблицу кодов
     code_table = CodeTable()
@@ -99,6 +78,4 @@ def Huffman(nodes: list[CoderNode]) -> Tuple[CodeTable, List[List[Tuple[str, flo
                 original_node.frequency
             ))
 
-    # Возвращаем и коды, и ШАГИ
     return code_table, steps
-# [file content end]

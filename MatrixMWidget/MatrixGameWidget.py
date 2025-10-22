@@ -148,41 +148,46 @@ class MatrixGameWidget(QFrame):
             return
 
 
-        if self.selected_method.currentIndex() == 2:
-            if self.game_with_nature.get_current_criteri() == 0:
-                table_view_a: QTableWidget = QTableWidget()
-                table_view_p: QTableWidget = QTableWidget()
+        if self.selected_method.currentIndex() == 2 and self.game_with_nature.get_current_criteri() == 0:
+            pprint(self.table[0])
+            pprint(self.table[1])
+            
+            A_table = self.table[0]
+            B_table = self.table[1]
 
-                table_view_a.setRowCount(len(self.table))
-                table_view_a.setColumnCount(len(self.table[0][0]))
-                table_view_a.setHorizontalHeaderLabels(self.table[0][0])
+            table_view_a: QTableWidget = QTableWidget()
+            table_view_p: QTableWidget = QTableWidget()
 
-                table_view_p.setRowCount(len(self.table))
-                table_view_p.setColumnCount(len(self.table[1][0]))
-                table_view_p.setHorizontalHeaderLabels(self.table[1][0])
+            table_view_a.setRowCount(len(A_table) - 1)
+            table_view_a.setColumnCount(len(A_table[0]))
+            table_view_a.setHorizontalHeaderLabels(A_table[0])
 
-
-                for i in range(1, len(self.table[0])):
-                    for j in range(len(self.table[0][i])):
-                        table_view_a.setItem(i - 1, j, QTableWidgetItem(str(self.table[0][i][j])))
-
-                for i in range(1, len(self.table[1])):
-                    for j in range(len(self.table[1][i])):
-                        table_view_p.setItem(i - 1, j, QTableWidgetItem(str(self.table[1][i][j])))
-
-                table_view_a.resizeColumnsToContents()
-                table_view_a.resizeRowsToContents()
-                table_view_a.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-
-                table_view_p.resizeColumnsToContents()
-                table_view_p.resizeRowsToContents()
-                table_view_p.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+            table_view_p.setRowCount(len(B_table))
+            table_view_p.setColumnCount(len(B_table[0]))
+            table_view_p.setHorizontalHeaderLabels(B_table[0])
 
 
-                v_box.addWidget(QLabel("Платёжная матрица"))
-                v_box.addWidget(table_view_a)
-                v_box.addWidget(QLabel("Матрица рисков"))
-                v_box.addWidget(table_view_p)
+            for i in range(1, len(A_table)):
+                for j in range(len(A_table[i])):
+                    table_view_a.setItem(i - 1, j, QTableWidgetItem(str(A_table[i][j])))
+
+            for i in range(1, len(B_table)):
+                for j in range(len(B_table[i])):
+                    table_view_p.setItem(i - 1, j, QTableWidgetItem(str(B_table[i][j])))
+
+            table_view_a.resizeColumnsToContents()
+            table_view_a.resizeRowsToContents()
+            table_view_a.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+
+            table_view_p.resizeColumnsToContents()
+            table_view_p.resizeRowsToContents()
+            table_view_p.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+
+
+            v_box.addWidget(QLabel("Платёжная матрица"))
+            v_box.addWidget(table_view_a)
+            v_box.addWidget(QLabel("Матрица рисков"))
+            v_box.addWidget(table_view_p)
 
         else:
             table_view: QTableWidget = QTableWidget()
@@ -267,6 +272,7 @@ class MatrixGameWidget(QFrame):
                     p)
 
                 self.table = res_game[0]
+                
                 result += f"Согласно матрице выйгрышей оптимальной стратегией является стратегия {res_game[0][res_game[-2] + 1][0]}. Ожидаемый выйгрыш - {res_game[0][res_game[-2] + 1][-1]}\n"
 
             # критерий Вальда
