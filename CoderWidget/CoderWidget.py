@@ -76,8 +76,8 @@ class CoderWidget(QFrame):
 
         self.code_decode_button: QPushButton = QPushButton("Кодировать")
         self.show_table: QPushButton = QPushButton("Вывод таблицы")
-        self.save_result: QPushButton = QPushButton("Сохранить")
-        self.load_result: QPushButton = QPushButton("Загрузить")
+        # self.save_result: QPushButton = QPushButton("Сохранить")
+        # self.load_result: QPushButton = QPushButton("Загрузить")
         self.clear_button: QPushButton = QPushButton("Очистить")
 
 
@@ -101,8 +101,8 @@ class CoderWidget(QFrame):
 
         self.grid_button.addWidget(self.code_decode_button, 0, 0)
         self.grid_button.addWidget(self.show_table, 0, 1)
-        self.grid_button.addWidget(self.save_result, 1, 0)
-        self.grid_button.addWidget(self.load_result, 1, 1)
+        # self.grid_button.addWidget(self.save_result, 1, 0)
+        # self.grid_button.addWidget(self.load_result, 1, 1)
         self.grid_button.addWidget(self.clear_button, 2, 0, 2, 0)
 
         self.v_box.addLayout(self.grid_button)
@@ -138,7 +138,7 @@ class CoderWidget(QFrame):
         # вывод и ввод поменяю местами что бы было не надо было вводить данные вручную
         self.input_msg.setText(self.output_msg.toPlainText())
         self.output_msg.clear()
-        
+
 
     def check_selected_verify(self, index):
         if index == 0 and len(self.code_table.table) != 0:

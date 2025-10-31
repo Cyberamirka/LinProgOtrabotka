@@ -59,7 +59,7 @@ class LinProgWidget (QFrame):
 
         self.result: tuple|str # type: ignore
         self.save_data: tuple|str # type: ignore
-        self.limits_variable: list[tuple]
+        self.limits_variable: list[tuple] = []
         self.num_variable: int
 
         self.button_box: QHBoxLayout = QHBoxLayout()
